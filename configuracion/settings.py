@@ -86,6 +86,10 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+  'DATETIME_FORMAT': "%d/%m/%Y %I:%M:%S %p",
+}
+
 
 
 # Password validation
