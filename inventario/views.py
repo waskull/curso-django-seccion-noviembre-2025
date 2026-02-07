@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from inventario.models import Producto, Categoria
 from inventario.serializers import ProductoSerializer, CategoriaSerializer, ProductoPostSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
 
 # Create your views here.
 class InventarioListView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get(self, request):
         nombre = self.request.query_params.get("nombre")
         categoria = self.request.query_params.get("categoria")
