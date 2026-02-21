@@ -14,7 +14,7 @@ class InventarioListView(APIView):
         nombre = self.request.query_params.get("nombre")
         categoria = self.request.query_params.get("categoria")
         data = Producto.objects.all()
-
+        #import ipdb; ipdb.set_trace()
         if nombre:
             data = data.filter(nombre__icontains=nombre)
 
@@ -24,6 +24,7 @@ class InventarioListView(APIView):
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(data, request)
         serializer = ProductoSerializer(page, many=True)
+        #ipdb.set_trace()
         return paginator.get_paginated_response(serializer.data)
     
     def post(self, request):

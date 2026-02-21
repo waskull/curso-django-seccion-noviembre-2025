@@ -5,10 +5,11 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from inventario.views import InventarioListView, InventarioDetailView, CategoriaListView, CategoriaDetailView
 from cuentas.views import UsuarioViewSet
+from tienda.views import CompraViewSet
 
 router = DefaultRouter()
 router.register('usuario', UsuarioViewSet, basename='usuarios')
-
+router.register('compra', CompraViewSet, basename='compras')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
