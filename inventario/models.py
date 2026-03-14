@@ -14,6 +14,7 @@ class Producto(BaseModel):
     cantidad = models.IntegerField(default=0)
     descripcion = models.TextField()
     categoria = models.ForeignKey('Categoria', on_delete=models.CASCADE)
+    precio = models.DecimalField(decimal_places=2, default=0.1,max_digits=8)
 
     def __str__(self):
         return self.nombre
