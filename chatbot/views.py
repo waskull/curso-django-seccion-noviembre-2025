@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from chatbot.models import Conversacion
 from chatbot.serializers import ConversacionSerializer
-from chatbot.rag import generar_respuesta_llamacpp
+from chatbot.rag import generar_respuesta
 from inventario.models import Producto
 
 
@@ -36,20 +36,31 @@ class ChatbotView(APIView):
             "=== INSTRUCCIÓN ===\n"
             "Responde solo con información del contexto. Sé claro, conciso y emite la respuesta en texto plano.\n"
         )
-        temperatura = serializer.validated_data.get("temperatura", 0.8)
+        temperatura = serializer.validated_data.get("temperatura", 0.7)
         modelo = serializer.validated_data.get("modelo", "modelo_base")
         try:
-            print("Haciendo petición a Llama.cpp con el modelo:", modelo)
+            print("Haciendo petición con el modelo:", modelo)
             print("Prompt:", prompt)
             print("Pregunta:", pregunta)
             print("Engine:", engine)
-            respuesta = generar_respuesta_llamacpp(prompt,pregunta, temperatura=temperatura)
+            respuesta = generar_respuesta(prompt,pregunta, temperatura=temperatura, engine=engine)
             print("Respuesta:", respuesta)
             LISTA_ERROR = ["No puedo responder a esa pregunta.",
                            "No puedo responder a tu pregunta.", "No puedo responder a tu pregunta", ""]
             if respuesta or respuesta not in LISTA_ERROR:
+               print("Guardando conversacion")
+               Conversacion.objects.create(pregunta=pregunta,respuesta=respuesta, usuario=request.user, temperatura=temperatura)
                return Response({"pregunta": pregunta, "respuesta": respuesta})
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
         return Response({"pregunta": pregunta, "respuesta": respuesta})
+    
+    def get(self, request):
+        if request.user.is_authenticated:
+            conversacion = Conversacion.objects.filter(
+                usuario=request.user)
+        else:
+            conversacion = Conversacion.objects.all()[:10]
+        serializer = ConversacionSerializer(conversacion, many=True)
+        return Response(serializer.data)

@@ -1,12 +1,21 @@
 import re
 import httpx
 from django.conf import settings
+LLAMA_CPP = "llamacpp"
+GROQ = "groq"
 
 
-def generar_respuesta_llamacpp(prompt: str, pregunta: str, n_predict: int = 384, temperatura: float = 0.8):
-    url = f"{settings.LLAMACPP_API}v1/chat/completions"
+def generar_respuesta(prompt: str, pregunta: str, n_predict: int = 384, temperatura: float = 0.8, engine: str = "llamacpp"):
+    headers = {
+        "Content-Type": "application/json"
+    }
+    if engine == GROQ:
+        url = f"{settings.GROQ_API}v1/chat/completions"
+        headers["Authorization"] = f"Bearer {settings.GROQ_API_KEY}"
+    else:
+        url = f"{settings.LLAMACPP_API}v1/chat/completions"
     payload = {
-        "model": "ACADEMOS xd",
+        "model": "llama-3.1-8b-instant",
         "messages": [
             {"role": "system", "content": prompt},
             {"role": "user", "content": pregunta}
@@ -16,12 +25,14 @@ def generar_respuesta_llamacpp(prompt: str, pregunta: str, n_predict: int = 384,
         "stream": False,
         "stop": ["Usuario:", "Pregunta:"],
     }
-    with httpx.Client(timeout=900) as client:
+    print(headers)
+    with httpx.Client(timeout=900, headers=headers) as client:
         print("haciendo peticion a: ", url)
         resp = client.post(url, json=payload)
         resp.raise_for_status()
         data = resp.json()
         return data['choices'][0]['message']['content']
+
 
 def limpiar_respuesta(respuesta: str):
     texto = re.sub(r"```+", "", respuesta)

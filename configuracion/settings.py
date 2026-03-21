@@ -67,8 +67,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'configuracion.wsgi.application'
-#GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API = os.getenv("GROQ_API")
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
