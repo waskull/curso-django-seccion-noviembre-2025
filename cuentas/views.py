@@ -55,3 +55,61 @@ class UsuarioViewSet(ModelViewSet):
             UsuarioSerializer(user).data,
             status=status.HTTP_201_CREATED
         )
+
+    def update(self, request, pk=None):
+        return self._perform_update(request, partial=False, pk=pk)
+
+    def partial_update(self, request, pk=None):
+        return self._perform_update(request, partial=True, pk=pk)
+
+    def _perform_update(self, request, pk, partial):
+        datos = self.get_object()
+        
+        if not (request.user.is_staff or request.user.is_superuser) and request.user != datos:
+            return Response(
+                {"detail": "No tienes permiso para editar a este usuario."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        serializer = self.get_serializer(datos, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        is_staff = request.data.get('is_staff')
+        is_superuser = request.data.get('is_superuser')
+        password = request.data.get('password')
+
+        user = serializer.save()
+
+        if request.user.is_staff or request.user.is_superuser:
+            if is_staff is not None:
+                user.is_staff = is_staff
+            if is_superuser is not None:
+                user.is_superuser = is_superuser
+        
+        if password:
+            user.set_password(password)
+        
+        user.save()
+
+        return Response(UsuarioSerializer(user).data)
+    
+    def destroy(self, request, pk=None):
+        datos = self.get_object()
+
+        if not (request.user.is_staff or request.user.is_superuser) and request.user != datos:
+            return Response(
+                {"detail": "No tienes permiso para eliminar este usuario."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        if datos.is_superuser and User.objects.filter(is_superuser=True).count() <= 1:
+            return Response(
+                {"detail": "No se puede eliminar al único superusuario del sistema."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        self.perform_destroy(datos)
+        return Response(
+            {"detail": "Usuario eliminado correctamente."},
+            status=status.HTTP_204_NO_CONTENT
+        )
