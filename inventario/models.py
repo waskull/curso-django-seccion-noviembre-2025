@@ -13,8 +13,8 @@ class Producto(BaseModel):
     nombre = models.CharField(unique=True)
     cantidad = models.IntegerField(default=0)
     descripcion = models.TextField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ForeignKey('Categoria', on_delete=models.CASCADE)
-    precio = models.DecimalField(decimal_places=2, default=0.1,max_digits=8)
 
     def __str__(self):
         return self.nombre
