@@ -8,9 +8,12 @@ class Compra(BaseModel):
     total = models.DecimalField(decimal_places=2, default=0,max_digits=8)
     creado_por = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Proveedor: {self.proveedor} Total: {self.total}"
+
     class Meta:
         verbose_name = "Compra"
-        verbose_name = "Compras"
+        verbose_name_plural = "Compras"
 
 class CompraDetalle(BaseModel):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
@@ -18,13 +21,23 @@ class CompraDetalle(BaseModel):
     precio = models.DecimalField(decimal_places=2, default=0.1,max_digits=8)
     compra = models.ForeignKey('Compra', on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = "CompraDetalle"
+        verbose_name_plural = "ComprasDetalle"
+
+    def __str__(self):
+        return f"Producto: {self.producto.nombre} Cantidad: {self.cantidad}"
+
 class Venta(BaseModel):
     total = models.DecimalField(decimal_places=2, default=0,max_digits=8)
     cliente = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Cliente: {self.cliente} Total: {self.total}"
+
     class Meta:
         verbose_name = "Venta"
-        verbose_name = "Ventas"
+        verbose_name_plural = "Ventas"
 
 class VentaDetalle(BaseModel):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
@@ -32,6 +45,9 @@ class VentaDetalle(BaseModel):
     precio = models.DecimalField(decimal_places=2, default=0.1,max_digits=8)
     venta = models.ForeignKey('Venta', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Producto: {self.producto.nombre} Cantidad: {self.cantidad}"
+
     class Meta:
         verbose_name = "VentaDetalle"
-        verbose_name = "VentaDetalles"
+        verbose_name_plural = "VentaDetalles"

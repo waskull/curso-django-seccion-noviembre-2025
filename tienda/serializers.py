@@ -9,7 +9,7 @@ class CompraDetalleSerializer(serializers.ModelSerializer):
 
 
 class CompraSerializer(serializers.ModelSerializer):
-    detalles = CompraDetalleSerializer(many=True, source='compradetalle_set')
+    detalles = CompraDetalleSerializer(many=True, write_only=True)
     creado_por = serializers.ReadOnlyField(source="creado_por.username")
 
     class Meta:
@@ -23,10 +23,11 @@ class VentaDetalleSerializer(serializers.ModelSerializer):
     class Meta:
         model = VentaDetalle
         fields = ("cantidad", "precio", "producto")
+        read_only_fields = ['precio']
 
 
 class VentaSerializer(serializers.ModelSerializer):
-    detalles = VentaDetalleSerializer(many=True, source='ventadetalle_set')
+    detalles = VentaDetalleSerializer(many=True, write_only=True)
     cliente = serializers.ReadOnlyField(source="cliente.username")
 
     class Meta:
